@@ -17,13 +17,25 @@ jobs:
       - uses: gradle/actions/setup-gradle@v4
         with:
           gradle-version: '8.7'
+      - name: Signing key (keeps the same signature so in-app updates work)
+        env:
+          KS: ${{ secrets.KEYSTORE_B64 }}
+        run: |
+          if [ -n "$KS" ]; then
+            echo "$KS" | base64 -d > "$RUNNER_TEMP/noor.p12"
+            echo "KEYSTORE_FILE=$RUNNER_TEMP/noor.p12" >> "$GITHUB_ENV"
+          else
+            echo "::warning::KEYSTORE_B64 secret not set - in-app updates will not work"
+          fi
       - name: Build
-        run: gradle :app:assembleDebug --no-daemon
+        env:
+          KEYSTORE_PASS: ${{ secrets.KEYSTORE_PASS }}
+        run: gradle :app:assembleRelease -PbuildNumber=${{ github.run_number }} --no-daemon
       - name: Rename
-        run: cp app/build/outputs/apk/debug/app-debug.apk NoorDaily.apk
+        run: cp app/build/outputs/apk/release/app-release.apk NoorDaily.apk
       - uses: actions/upload-artifact@v4
         with:
-          name: NoorDaily.apk
+          name: NoorDaily-apk
           path: NoorDaily.apk
       - uses: softprops/action-gh-release@v2
         with:

@@ -25,10 +25,10 @@ public class Charts {
         public Ring(Context c) {
             super(c);
             setLayerType(LAYER_TYPE_SOFTWARE, null);
-            tr.setStyle(Paint.Style.STROKE); tr.setColor(0x22FFFFFF);
+            tr.setStyle(Paint.Style.STROKE); tr.setColor(0x14FFFFFF);
             ar.setStyle(Paint.Style.STROKE); ar.setStrokeCap(Paint.Cap.ROUND);
             glow.setStyle(Paint.Style.STROKE); glow.setStrokeCap(Paint.Cap.ROUND);
-            t1.setColor(Ui.TEXT); t1.setTextAlign(Paint.Align.CENTER); t1.setTypeface(Typeface.create("sans-serif-black", Typeface.BOLD));
+            t1.setColor(Ui.TEXT); t1.setTextAlign(Paint.Align.CENTER); t1.setTypeface(Typeface.create("sans-serif-medium", Typeface.NORMAL));
             t2.setColor(Ui.MUTED); t2.setTextAlign(Paint.Align.CENTER);
         }
         public Ring set(float f, String b, String s, int[] col) {
@@ -50,7 +50,7 @@ public class Charts {
                 SweepGradient sg = new SweepGradient(cx, cy, cc, null);
                 Matrix m = new Matrix(); m.setRotate(-90, cx, cy); sg.setLocalMatrix(m);
                 ar.setShader(sg); glow.setShader(sg);
-                glow.setMaskFilter(new BlurMaskFilter(sw * 0.9f, BlurMaskFilter.Blur.NORMAL)); glow.setAlpha(150);
+                glow.setMaskFilter(new BlurMaskFilter(sw * 0.9f, BlurMaskFilter.Blur.NORMAL)); glow.setAlpha(90);
                 c.drawArc(o, -90, 360 * shown, false, glow);
                 c.drawArc(o, -90, 360 * shown, false, ar);
             }
@@ -66,7 +66,7 @@ public class Charts {
         final Paint bp = new Paint(Paint.ANTI_ALIAS_FLAG), gp = new Paint(Paint.ANTI_ALIAS_FLAG), lp = new Paint(Paint.ANTI_ALIAS_FLAG);
         public Bars(Context c) {
             super(c);
-            gp.setStyle(Paint.Style.STROKE); gp.setColor(Ui.GOLD); gp.setStrokeWidth(4); gp.setPathEffect(new DashPathEffect(new float[]{14, 12}, 0));
+            gp.setStyle(Paint.Style.STROKE); gp.setColor(0x66FFFFFF); gp.setStrokeWidth(3); gp.setPathEffect(new DashPathEffect(new float[]{14, 12}, 0));
             lp.setColor(Ui.MUTED); lp.setTextAlign(Paint.Align.CENTER);
         }
         public Bars set(float[] values, String[] lab, float goalLine, int[] col, int hl) {
@@ -83,11 +83,11 @@ public class Charts {
             lp.setTextSize(Math.min(lh * 0.66f, slot * 0.46f));
             for (int i = 0; i < v.length; i++) {
                 float x = slot * i + (slot - bw) / 2, bh = (bottom - top) * (v[i] / max) * grow;
-                bp.setShader(null); bp.setColor(0x16FFFFFF);
+                bp.setShader(null); bp.setColor(0x0FFFFFFF);
                 c.drawRoundRect(new RectF(x, top, x + bw, bottom), bw / 2.4f, bw / 2.4f, bp);
                 if (v[i] > 0) {
                     float y0 = bottom - Math.max(bh, bw * 0.5f * grow);
-                    int[] cc = i == highlight ? Ui.G_REPORT : colors;
+                    int[] cc = colors;
                     bp.setShader(new LinearGradient(0, y0, 0, bottom, cc[0], cc[cc.length - 1], Shader.TileMode.CLAMP));
                     c.drawRoundRect(new RectF(x, y0, x + bw, bottom), bw / 2.4f, bw / 2.4f, bp);
                 }
@@ -100,10 +100,13 @@ public class Charts {
     /** Slowly drifting colorful aurora behind everything. */
     public static class Aurora extends View {
         final Paint p = new Paint(Paint.ANTI_ALIAS_FLAG);
-        final int[] cols = {Color.parseColor("#7C3AED"), Color.parseColor("#06B6D4"), Color.parseColor("#EC4899"), Color.parseColor("#10B981")};
+        final int[] cols = {Color.parseColor("#3B2F7A"), Color.parseColor("#0F4C5C"), Color.parseColor("#1F3A68"), Color.parseColor("#14463A")};
         final float[][] seed = {{0.15f, 0.12f, 0.0f}, {0.9f, 0.3f, 1.7f}, {0.2f, 0.75f, 3.1f}, {0.85f, 0.9f, 4.4f}};
         long start = System.currentTimeMillis();
-        public Aurora(Context c) { super(c); }
+        public Aurora(Context c) {
+            super(c);
+            if (android.os.Build.VERSION.SDK_INT >= 31) setRenderEffect(android.graphics.RenderEffect.createBlurEffect(60f, 60f, Shader.TileMode.CLAMP));
+        }
         @Override protected void onDraw(Canvas c) {
             float w = getWidth(), h = getHeight(), t = (System.currentTimeMillis() - start) / 1000f;
             c.drawColor(Ui.BG);
@@ -111,10 +114,10 @@ public class Charts {
                 float x = w * (seed[i][0] + 0.12f * (float) Math.sin(t * 0.13 + seed[i][2]));
                 float y = h * (seed[i][1] + 0.08f * (float) Math.cos(t * 0.11 + seed[i][2]));
                 float r = Math.max(w, h) * 0.55f;
-                p.setShader(new RadialGradient(x, y, r, (cols[i] & 0x00FFFFFF) | 0x55000000, 0x00000000, Shader.TileMode.CLAMP));
+                p.setShader(new RadialGradient(x, y, r, (cols[i] & 0x00FFFFFF) | 0x66000000, 0x00000000, Shader.TileMode.CLAMP));
                 c.drawCircle(x, y, r, p);
             }
-            postInvalidateDelayed(50);
+            postInvalidateDelayed(66);
         }
     }
 }

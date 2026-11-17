@@ -43,21 +43,22 @@ public class SettingsActivity extends Activity {
     void build() {
         FrameLayout frame = new FrameLayout(this);
         frame.addView(new Charts.Aurora(this), new FrameLayout.LayoutParams(-1, -1));
-        ScrollView sv = new ScrollView(this);
+        ScrollView sv = new ScrollView(this); sv.setVerticalScrollBarEnabled(false); sv.setOverScrollMode(View.OVER_SCROLL_NEVER);
+        frame.setBackgroundColor(Ui.BG);
         root = Ui.col(this);
         int p = Ui.dp(this, 18); root.setPadding(p, Ui.dp(this, 46), p, Ui.dp(this, 50));
         sv.addView(root);
         frame.addView(sv);
 
         LinearLayout top = Ui.row(this);
-        TextView back = Ui.button(this, "←", null); back.setOnClickListener(v -> finish());
-        top.addView(back, new LinearLayout.LayoutParams(Ui.dp(this, 52), Ui.dp(this, 48)));
+        FrameLayout back = Ui.tile(this, R.drawable.ic_back, Ui.TEXT, 44, false); back.setOnClickListener(v -> finish()); Ui.press(back);
+        top.addView(back);
         TextView t = Ui.title(this, "Settings", 28); t.setPadding(Ui.dp(this, 14), 0, 0, 0);
         top.addView(t);
         root.addView(top);
 
         // profile
-        LinearLayout pr = section("👤", "Your profile", Ui.G_WATER);
+        LinearLayout pr = section(R.drawable.ic_user, "Your profile", Ui.BLUE);
         pr.addView(numRow("Age (years)", "age", d.age(), 10, 100));
         EditText ft = num(d.feet()), in = num(d.inches());
         LinearLayout hr = Ui.row(this);
@@ -72,78 +73,88 @@ public class SettingsActivity extends Activity {
         in.setOnEditorActionListener((v, a, e) -> { saveH.run(); return false; });
         pr.addView(labelRow("Height", hr));
         pr.addView(numRow("Weight (kg)", "weight", d.weight(), 25, 250));
-        pr.addView(choice("Sex", new String[]{"Male", "Female"}, d.female() ? 1 : 0, Ui.G_WATER, i -> d.setBool("female", i == 1)));
-        pr.addView(choice("Activity", new String[]{"Low", "Moderate", "High"}, d.activity(), Ui.G_WATER, i -> d.setInt("activity", i)));
+        pr.addView(choice("Sex", new String[]{"Male", "Female"}, d.female() ? 1 : 0, i -> d.setBool("female", i == 1)));
+        pr.addView(choice("Activity", new String[]{"Low", "Moderate", "High"}, d.activity(), i -> d.setInt("activity", i)));
         goalInfo = Ui.text(this, "", 14, Ui.BLUE, true); goalInfo.setPadding(0, Ui.dp(this, 14), 0, 0);
         pr.addView(goalInfo);
 
         // quran
-        LinearLayout qu = section("📖", "Quran hifz", Ui.G_QURAN);
-        qu.addView(choice("Daily portion", new String[]{"¼ para", "½ para", "1 para"}, d.hifzDaily() == 2 ? 0 : d.hifzDaily() == 8 ? 2 : 1, Ui.G_QURAN, i -> d.setInt("hifzDaily", new int[]{2, 4, 8}[i])));
-        TextView sp = Ui.button(this, "Start from Para " + (d.hifzPos() / 8 + 1), null);
+        LinearLayout qu = section(R.drawable.ic_quran, "Quran hifz", Ui.GOLD);
+        qu.addView(choice("Daily portion", new String[]{"¼ para", "½ para", "1 para"}, d.hifzDaily() == 2 ? 0 : d.hifzDaily() == 8 ? 2 : 1, i -> d.setInt("hifzDaily", new int[]{2, 4, 8}[i])));
+        TextView sp = Ui.button(this, "Start from Para " + (d.hifzPos() / 8 + 1), false);
         sp.setOnClickListener(v -> {
             String[] items = new String[30]; for (int i = 0; i < 30; i++) items[i] = "Para " + (i + 1) + "  ·  " + Data.PARA[i];
             new AlertDialog.Builder(this, THEME).setTitle("Where are you starting?").setItems(items, (x, i) -> {
                 new AlertDialog.Builder(this, THEME).setTitle("Start from Para " + (i + 1) + "?").setMessage("Paras before it will be marked as memorized.")
-                        .setPositiveButton("Yes", (a, b2) -> { d.setHifzStartPara(i + 1); recreate(); }).setNegativeButton("Cancel", null).show();
+                        .setPositiveButton("Yes", (a, b2) -> { d.setHifzStartPara(i + 1); recreate(); }).setNegativeButton("Cancel", false).show();
             }).show();
         });
         qu.addView(sp, Ui.top(this, 12));
 
         // water & schedule
-        LinearLayout w = section("💧", "Water & daily schedule", Ui.G_WATER);
-        w.addView(choice("Glass size", new String[]{"150", "250", "350", "500 ml"}, idx(d.glass(), new int[]{150, 250, 350, 500}), Ui.G_WATER, i -> d.setInt("glass", new int[]{150, 250, 350, 500}[i])));
+        LinearLayout w = section(R.drawable.ic_water, "Water & daily schedule", Ui.BLUE);
+        w.addView(choice("Glass size", new String[]{"150", "250", "350", "500 ml"}, idx(d.glass(), new int[]{150, 250, 350, 500}), i -> d.setInt("glass", new int[]{150, 250, 350, 500}[i])));
         w.addView(timeRow("Wake up", "wake", d.wake()));
         w.addView(timeRow("Sleep", "sleep", d.sleep()));
         w.addView(sw("Water reminders (one quiet notification)", "waterOn", true));
 
         // warnings
-        LinearLayout wr = section("⏰", "Warnings & report", Ui.G_REPORT);
+        LinearLayout wr = section(R.drawable.ic_bell, "Warnings & report", Ui.TEXT);
         wr.addView(sw("Warn me about unfinished tasks", "warnOn", true));
         wr.addView(timeRow("First warning", "warn1", d.getInt("warn1", 20 * 60)));
         wr.addView(timeRow("Last warning", "warn2", d.getInt("warn2", 22 * 60 + 30)));
         wr.addView(sw("Daily report at 11:59 PM", "reportOn", true));
 
         // security
-        LinearLayout se = section("🔒", "Privacy & security", Ui.G_ZIKR);
-        se.addView(note("Noor Daily has no internet permission. Your data never leaves this phone and is excluded from cloud backups."));
-        TextView pinBtn = Ui.button(this, d.hasPin() ? "Change PIN" : "Set a PIN lock", Ui.G_ZIKR);
+        LinearLayout se = section(R.drawable.ic_shield, "Privacy & security", Ui.ACCENT);
+        se.addView(note("Your data stays on this phone and is excluded from cloud backups. Internet is used only by the Update button, and only to reach your own GitHub repo."));
+        TextView pinBtn = Ui.button(this, d.hasPin() ? "Change PIN" : "Set a PIN lock", true);
         pinBtn.setOnClickListener(v -> askPin());
         se.addView(pinBtn, Ui.top(this, 12));
         if (d.hasPin()) {
-            TextView rm = Ui.button(this, "Remove PIN", null); rm.setTextColor(Ui.RED);
-            rm.setOnClickListener(v -> new AlertDialog.Builder(this, THEME).setTitle("Remove PIN?").setPositiveButton("Remove", (x, y) -> { d.clearPin(); recreate(); }).setNegativeButton("Cancel", null).show());
+            TextView rm = Ui.button(this, "Remove PIN", false); rm.setTextColor(Ui.RED);
+            rm.setOnClickListener(v -> new AlertDialog.Builder(this, THEME).setTitle("Remove PIN?").setPositiveButton("Remove", (x, y) -> { d.clearPin(); recreate(); }).setNegativeButton("Cancel", false).show());
             se.addView(rm, Ui.top(this, 8));
         }
         se.addView(sw("Block screenshots & hide in recent apps", "secure", true));
 
         // permissions
-        LinearLayout pm = section("⚙️", "Make reminders reliable", Ui.G_FOCUS);
-        TextView n = Ui.button(this, "Allow notifications", null);
-        n.setOnClickListener(v -> { if (checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) requestPermissions(new String[]{Manifest.permission.POST_NOTIFICATIONS}, 1); else Toast.makeText(this, "Already allowed ✓", Toast.LENGTH_SHORT).show(); });
+        LinearLayout pm = section(R.drawable.ic_settings, "Make reminders reliable", Ui.TEXT);
+        TextView n = Ui.button(this, "Allow notifications", false);
+        n.setOnClickListener(v -> { if (checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) requestPermissions(new String[]{Manifest.permission.POST_NOTIFICATIONS}, 1); else Toast.makeText(this, "Already allowed", Toast.LENGTH_SHORT).show(); });
         pm.addView(n, Ui.top(this, 12));
-        TextView bat = Ui.button(this, "Allow running in background", null);
+        TextView bat = Ui.button(this, "Allow running in background", false);
         bat.setOnClickListener(v -> {
             PowerManager pw = getSystemService(PowerManager.class);
-            if (pw.isIgnoringBatteryOptimizations(getPackageName())) { Toast.makeText(this, "Already allowed ✓", Toast.LENGTH_SHORT).show(); return; }
+            if (pw.isIgnoringBatteryOptimizations(getPackageName())) { Toast.makeText(this, "Already allowed", Toast.LENGTH_SHORT).show(); return; }
             try { startActivity(new Intent(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS, Uri.parse("package:" + getPackageName()))); } catch (Exception e) { Toast.makeText(this, "Open Settings > Apps > Noor Daily > Battery", Toast.LENGTH_LONG).show(); }
         });
         pm.addView(bat, Ui.top(this, 8));
+
+        // updates
+        LinearLayout up = section(R.drawable.ic_download, "Updates", Ui.ACCENT);
+        up.addView(note("Version " + getVer() + "  ·  build " + Updater.currentBuild(this)));
+        up.addView(note("Downloads the newest release from github.com/" + Updater.REPO + ". Android only installs it if it's signed with your key."));
+        TextView ub = Ui.button(this, "Check for updates", true);
+        ub.setOnClickListener(v -> Updater.check(this));
+        up.addView(ub, Ui.top(this, 14));
 
         setContentView(frame);
         for (int i = 0; i < root.getChildCount(); i++) Ui.enter(root.getChildAt(i), i);
         after();
     }
 
+    String getVer() { try { return getPackageManager().getPackageInfo(getPackageName(), 0).versionName; } catch (Exception e) { return "?"; } }
+
     void after() {
-        goalInfo.setText("💧 Water goal " + Data.fmt(d.waterGoal()) + " ml   ·   BMI " + String.format(Locale.US, "%.1f", d.bmi()) + " (" + Data.bmiLabel(d.bmi()) + ")");
+        goalInfo.setText("Water goal " + Data.fmt(d.waterGoal()) + " ml   ·   BMI " + String.format(Locale.US, "%.1f", d.bmi()) + " (" + Data.bmiLabel(d.bmi()) + ")");
         Alarms.scheduleAll(this);
     }
 
-    LinearLayout section(String emoji, String t, int[] g) {
+    LinearLayout section(int icon, String t, int color) {
         LinearLayout c = Ui.card(this);
         LinearLayout h = Ui.row(this);
-        h.addView(Ui.tile(this, emoji, g, 36));
+        h.addView(Ui.tile(this, icon, color, 38, true));
         TextView tt = Ui.text(this, t, 17, Ui.TEXT, true); tt.setPadding(Ui.dp(this, 12), 0, 0, 0);
         h.addView(tt);
         c.addView(h);
@@ -176,7 +187,7 @@ public class SettingsActivity extends Activity {
         try { int v = Integer.parseInt(e.getText().toString().trim()); if (v >= min && v <= max) { d.setInt(key, v); after(); } else Toast.makeText(this, "Enter " + min + " to " + max, Toast.LENGTH_SHORT).show(); } catch (Exception ignored) {}
     }
     interface Pick { void on(int i); }
-    LinearLayout choice(String label, String[] opts, int sel, int[] g, Pick pick) {
+    LinearLayout choice(String label, String[] opts, int sel, Pick pick) {
         LinearLayout box = Ui.col(this);
         TextView l = Ui.text(this, label, 15.5f, Ui.TEXT, false); l.setPadding(0, Ui.dp(this, 14), 0, Ui.dp(this, 8));
         box.addView(l);
@@ -184,12 +195,12 @@ public class SettingsActivity extends Activity {
         TextView[] bs = new TextView[opts.length];
         for (int i = 0; i < opts.length; i++) {
             final int k = i;
-            TextView b = Ui.button(this, opts[i], i == sel ? g : null);
+            TextView b = Ui.button(this, opts[i], i == sel);
             b.setTextSize(13.5f);
             bs[i] = b;
             b.setOnClickListener(v -> {
                 pick.on(k); after();
-                for (int j = 0; j < bs.length; j++) { bs[j].setBackground(j == k ? Ui.grad(g, Ui.dp(this, 18)) : Ui.glass(this, 18)); bs[j].setTextColor(j == k ? Color.parseColor("#0B1020") : Ui.TEXT); }
+                for (int j = 0; j < bs.length; j++) Ui.setButton(this, bs[j], j == k);
                 Ui.pop(b);
             });
             r.addView(b, Ui.weight(this, 46, i == 0 ? 0 : 8));
@@ -198,7 +209,7 @@ public class SettingsActivity extends Activity {
         return box;
     }
     LinearLayout timeRow(String label, String key, int min) {
-        TextView t = Ui.button(this, Data.hm(min), null);
+        TextView t = Ui.button(this, Data.hm(min), false);
         t.setOnClickListener(v -> new TimePickerDialog(this, THEME, (tp, h, m) -> { d.setInt(key, h * 60 + m); t.setText(Data.hm(h * 60 + m)); after(); }, min / 60, min % 60, false).show());
         return labelRow(label, t);
     }
@@ -220,7 +231,7 @@ public class SettingsActivity extends Activity {
             if (p1.length() < 4 || p1.length() > 8) { Toast.makeText(this, "PIN must be 4-8 digits", Toast.LENGTH_LONG).show(); return; }
             if (!p1.equals(p2)) { Toast.makeText(this, "PINs don't match", Toast.LENGTH_LONG).show(); return; }
             d.setPin(p1); App.unlocked = true;
-            Toast.makeText(this, "PIN set ✓", Toast.LENGTH_SHORT).show(); recreate();
-        }).setNegativeButton("Cancel", null).show();
+            Toast.makeText(this, "PIN set", Toast.LENGTH_SHORT).show(); recreate();
+        }).setNegativeButton("Cancel", false).show();
     }
 }

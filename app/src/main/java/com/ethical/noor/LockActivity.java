@@ -6,6 +6,7 @@ import android.os.Handler;
 import android.os.Looper;
 import android.view.Gravity;
 import android.widget.GridLayout;
+import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -19,10 +20,11 @@ public class LockActivity extends Activity {
         d = new Data(this);
         LinearLayout root = new LinearLayout(this);
         root.setOrientation(LinearLayout.VERTICAL); root.setGravity(Gravity.CENTER_HORIZONTAL);
-        root.setBackground(Ui.grad(new int[]{0xFF1E1B4B, 0xFF070A12, 0xFF052E2B}, 0));
+        root.setBackgroundColor(Ui.BG);
         root.setPadding(Ui.dp(this, 30), Ui.dp(this, 90), Ui.dp(this, 30), Ui.dp(this, 30));
-        TextView icon = Ui.text(this, "🔒", 46, Ui.TEXT, false); icon.setGravity(Gravity.CENTER);
-        root.addView(icon);
+        FrameLayout icon = Ui.tile(this, R.drawable.ic_lock, Ui.ACCENT, 72, true);
+        LinearLayout.LayoutParams il = new LinearLayout.LayoutParams(-2, -2); il.gravity = Gravity.CENTER_HORIZONTAL;
+        root.addView(icon, il);
         TextView t = Ui.text(this, "Noor Daily is locked", 22, Ui.TEXT, true); t.setGravity(Gravity.CENTER); t.setPadding(0, Ui.dp(this, 12), 0, 0);
         root.addView(t);
         dots = Ui.text(this, "", 34, Ui.GREEN, true); dots.setGravity(Gravity.CENTER); dots.setPadding(0, Ui.dp(this, 24), 0, 0);
@@ -32,7 +34,7 @@ public class LockActivity extends Activity {
         GridLayout g = new GridLayout(this); g.setColumnCount(3);
         String[] keys = {"1", "2", "3", "4", "5", "6", "7", "8", "9", "⌫", "0", "✓"};
         for (String k : keys) {
-            TextView b2 = Ui.button(this, k, k.equals("✓") ? Ui.G_TASK : null); b2.setTextSize(24);
+            TextView b2 = Ui.button(this, k, k.equals("✓")); b2.setTextSize(24);
             GridLayout.LayoutParams lp = new GridLayout.LayoutParams();
             lp.width = Ui.dp(this, 86); lp.height = Ui.dp(this, 72); lp.setMargins(Ui.dp(this, 8), Ui.dp(this, 8), Ui.dp(this, 8), Ui.dp(this, 8));
             b2.setOnClickListener(v -> key(k));

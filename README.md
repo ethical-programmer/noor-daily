@@ -24,7 +24,8 @@ Healthy, focused and connected to your deen, every day. Everything stays on your
 - 15/25/45/60 minute focus sessions with a break reminder
 
 **Privacy & security**
-- No internet permission at all: the app cannot send data anywhere
+- Internet is used only by Settings → Updates, which talks to this GitHub repo over HTTPS. Nothing about you is ever uploaded.
+- Updates install only if signed with your own key (GitHub secrets KEYSTORE_B64 / KEYSTORE_PASS)
 - Excluded from cloud backups and device transfers
 - Optional PIN lock (salted + hashed, lockout after repeated wrong tries)
 - Screenshots blocked and content hidden in recent apps (can be turned off)

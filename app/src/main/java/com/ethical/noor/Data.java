@@ -21,7 +21,7 @@ public class Data {
     public Data(Context ctx) {
         c = ctx.getApplicationContext();
         p = c.getSharedPreferences("noor", Context.MODE_PRIVATE);
-        if (p.getInt("seedv", 0) < 2) { seedDefaults(); p.edit().putInt("seedv", 2).apply(); }
+        if (p.getInt("seedv", 0) < 3) { seedDefaults(); p.edit().putInt("seedv", 3).apply(); }
     }
 
     // ---------------- dates ----------------
@@ -114,14 +114,14 @@ public class Data {
     // ---------------- tasks ----------------
     void seedDefaults() {
         JSONArray t = new JSONArray();
-        t.put(task("walk", "🚶", "Walk 30 minutes", "tick", 1, "", 1));
-        t.put(task("stretch", "🧘", "Stretching (5 min, 3 times)", "tick", 1, "", 1));
-        t.put(task("stairs", "🪜", "Stairs up & down (10 floors)", "tick", 1, "", 1));
-        t.put(task("eyes", "👀", "Eye rest 20-20-20", "tick", 1, "", 1));
-        t.put(task("breath", "🌬️", "Deep breathing 5 minutes", "tick", 1, "", 1));
-        t.put(task("sun", "☀️", "Sunlight & fresh air", "tick", 1, "", 1));
-        t.put(task("junk", "🥗", "No junk food or soda", "tick", 1, "", 1));
-        t.put(task("sleep", "😴", "Phone away 30 min before sleep", "tick", 1, "", 1));
+        t.put(task("walk", "walk", "Walk 30 minutes", "tick", 1, "", 1));
+        t.put(task("stretch", "stretch", "Stretching (5 min, 3 times)", "tick", 1, "", 1));
+        t.put(task("stairs", "stairs", "Stairs up & down (10 floors)", "tick", 1, "", 1));
+        t.put(task("eyes", "eye", "Eye rest 20-20-20", "tick", 1, "", 1));
+        t.put(task("breath", "wind", "Deep breathing 5 minutes", "tick", 1, "", 1));
+        t.put(task("sun", "sun", "Sunlight & fresh air", "tick", 1, "", 1));
+        t.put(task("junk", "food", "No junk food or soda", "tick", 1, "", 1));
+        t.put(task("sleep", "moon", "Phone away 30 min before sleep", "tick", 1, "", 1));
         JSONArray z = new JSONArray();
         z.put(zikr("subhan", "SubhanAllah", "سُبْحَانَ ٱللَّٰهِ", 33));
         z.put(zikr("hamd", "Alhamdulillah", "ٱلْحَمْدُ لِلَّٰهِ", 33));

@@ -1,4 +1,8 @@
 plugins { id 'com.android.application' }
+
+def buildNumber = (project.findProperty('buildNumber') ?: '1').toString()
+def ks = System.getenv('KEYSTORE_FILE')
+
 android {
     namespace 'com.ethical.noor'
     compileSdk 34
@@ -6,9 +10,25 @@ android {
         applicationId 'com.ethical.noor'
         minSdk 28
         targetSdk 34
-        versionCode 1
-        versionName '1.0'
+        versionCode buildNumber.toInteger()
+        versionName "1.0." + buildNumber
     }
-    buildTypes { debug { minifyEnabled false } }
+    signingConfigs {
+        release {
+            if (ks) {
+                storeFile file(ks)
+                storePassword System.getenv('KEYSTORE_PASS')
+                keyAlias 'noor'
+                keyPassword System.getenv('KEYSTORE_PASS')
+                storeType 'pkcs12'
+            }
+        }
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            signingConfig ks ? signingConfigs.release : signingConfigs.debug
+        }
+    }
     compileOptions { sourceCompatibility JavaVersion.VERSION_17; targetCompatibility JavaVersion.VERSION_17 }
 }

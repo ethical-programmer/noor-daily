@@ -29,11 +29,11 @@ public class Notifs {
 
     public static void show(Context c, int id, String ch, String title, String text, int tab, Notification.Action action) {
         Notification.Builder b = new Notification.Builder(c, ch)
-                .setSmallIcon(android.R.drawable.ic_popup_reminder)
+                .setSmallIcon(R.drawable.ic_notify)
                 .setContentTitle(title)
                 .setContentText(text)
                 .setStyle(new Notification.BigTextStyle().bigText(text))
-                .setColor(Ui.GREEN)
+                .setColor(Ui.ACCENT)
                 .setAutoCancel(true)
                 .setOnlyAlertOnce(true)
                 .setVisibility(Notification.VISIBILITY_PRIVATE)
