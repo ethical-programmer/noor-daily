@@ -19,7 +19,7 @@ public class LockActivity extends Activity {
         d = new Data(this);
         LinearLayout root = new LinearLayout(this);
         root.setOrientation(LinearLayout.VERTICAL); root.setGravity(Gravity.CENTER_HORIZONTAL);
-        root.setBackgroundColor(Ui.BG);
+        root.setBackground(Ui.grad(new int[]{0xFF1E1B4B, 0xFF070A12, 0xFF052E2B}, 0));
         root.setPadding(Ui.dp(this, 30), Ui.dp(this, 90), Ui.dp(this, 30), Ui.dp(this, 30));
         TextView icon = Ui.text(this, "🔒", 46, Ui.TEXT, false); icon.setGravity(Gravity.CENTER);
         root.addView(icon);
@@ -32,7 +32,7 @@ public class LockActivity extends Activity {
         GridLayout g = new GridLayout(this); g.setColumnCount(3);
         String[] keys = {"1", "2", "3", "4", "5", "6", "7", "8", "9", "⌫", "0", "✓"};
         for (String k : keys) {
-            TextView b2 = Ui.button(this, k, Ui.TEXT, false); b2.setTextSize(24);
+            TextView b2 = Ui.button(this, k, k.equals("✓") ? Ui.G_TASK : null); b2.setTextSize(24);
             GridLayout.LayoutParams lp = new GridLayout.LayoutParams();
             lp.width = Ui.dp(this, 86); lp.height = Ui.dp(this, 72); lp.setMargins(Ui.dp(this, 8), Ui.dp(this, 8), Ui.dp(this, 8), Ui.dp(this, 8));
             b2.setOnClickListener(v -> key(k));

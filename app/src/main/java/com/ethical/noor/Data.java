@@ -21,7 +21,7 @@ public class Data {
     public Data(Context ctx) {
         c = ctx.getApplicationContext();
         p = c.getSharedPreferences("noor", Context.MODE_PRIVATE);
-        if (!p.contains("tasks")) seedDefaults();
+        if (p.getInt("seedv", 0) < 2) { seedDefaults(); p.edit().putInt("seedv", 2).apply(); }
     }
 
     // ---------------- dates ----------------
@@ -55,6 +55,9 @@ public class Data {
         int r = (int) (Math.round(g / 50.0) * 50);
         return Math.max(1500, Math.min(5000, r));
     }
+    public int feet() { return (int) Math.floor(height() / 30.48); }
+    public int inches() { return (int) Math.round((height() - feet() * 30.48) / 2.54) % 12; }
+    public void setFeetInches(int ft, int in) { setInt("height", (int) Math.round(ft * 30.48 + in * 2.54)); }
     public double bmi() { double h = height() / 100.0; return h <= 0 ? 0 : weight() / (h * h); }
     public static String bmiLabel(double b) { return b < 18.5 ? "Underweight" : b < 25 ? "Healthy" : b < 30 ? "Overweight" : "Obese"; }
 
@@ -111,13 +114,12 @@ public class Data {
     // ---------------- tasks ----------------
     void seedDefaults() {
         JSONArray t = new JSONArray();
-        t.put(task("walk", "🚶", "Walk", "count", 30, "min", 5));
-        t.put(task("stretch", "🧘", "Stretching", "count", 3, "times", 1));
-        t.put(task("stairs", "🪜", "Stairs up & down", "count", 10, "floors", 1));
-        t.put(task("eyes", "👀", "Eye rest (20-20-20)", "count", 6, "times", 1));
-        t.put(task("breath", "🌬️", "Deep breathing", "count", 5, "min", 1));
-        t.put(task("sun", "☀️", "Sunlight / fresh air", "tick", 1, "", 1));
-        t.put(task("read", "📖", "Read or learn 15 min", "tick", 1, "", 1));
+        t.put(task("walk", "🚶", "Walk 30 minutes", "tick", 1, "", 1));
+        t.put(task("stretch", "🧘", "Stretching (5 min, 3 times)", "tick", 1, "", 1));
+        t.put(task("stairs", "🪜", "Stairs up & down (10 floors)", "tick", 1, "", 1));
+        t.put(task("eyes", "👀", "Eye rest 20-20-20", "tick", 1, "", 1));
+        t.put(task("breath", "🌬️", "Deep breathing 5 minutes", "tick", 1, "", 1));
+        t.put(task("sun", "☀️", "Sunlight & fresh air", "tick", 1, "", 1));
         t.put(task("junk", "🥗", "No junk food or soda", "tick", 1, "", 1));
         t.put(task("sleep", "😴", "Phone away 30 min before sleep", "tick", 1, "", 1));
         JSONArray z = new JSONArray();
@@ -126,7 +128,7 @@ public class Data {
         z.put(zikr("akbar", "Allahu Akbar", "ٱللَّٰهُ أَكْبَرُ", 34));
         z.put(zikr("istighfar", "Astaghfirullah", "أَسْتَغْفِرُ ٱللَّٰهَ", 100));
         z.put(zikr("tahlil", "La ilaha illallah", "لَا إِلَٰهَ إِلَّا ٱللَّٰهُ", 100));
-        z.put(zikr("durood", "Durood Shareef", "ٱللَّٰهُمَّ صَلِّ عَلَىٰ مُحَمَّدٍ", 100));
+        z.put(zikr("durood", "Durood Shareef", "ٱللَّٰهُمَّ صَلِّ عَلَىٰ مُحَمَّدٍ", 30));
         p.edit().putString("tasks", t.toString()).putString("zikr", z.toString()).apply();
     }
     static JSONObject task(String id, String emoji, String name, String type, int target, String unit, int step) {
@@ -167,9 +169,30 @@ public class Data {
     public boolean zikrDone(String d, JSONObject z) { return zikrCount(d, z.optString("id")) >= z.optInt("target", 33); }
     public int zikrsDone(String d) { int n = 0; for (JSONObject z : zikrs()) if (zikrDone(d, z)) n++; return n; }
 
+    // ---------------- Quran hifz ----------------
+    public static final String[] PARA = {"Alif Lam Meem", "Sayaqool", "Tilkal Rusul", "Lan Tana Lu", "Wal Mohsanat", "La Yuhibbullah", "Wa Iza Samiu", "Wa Lau Annana", "Qalal Malao", "Wa A'lamu",
+            "Yatazeroon", "Wa Mamin Da'abat", "Wa Ma Ubrioo", "Rubama", "Subhanallazi", "Qal Alam", "Iqtaraba", "Qad Aflaha", "Wa Qalallazina", "A'man Khalaq",
+            "Utlu Ma Oohi", "Wa Manyaqnut", "Wa Mali", "Faman Azlam", "Elahe Yuruddo", "Ha'a Meem", "Qala Fama Khatbukum", "Qad Sami Allah", "Tabarakallazi", "Amma Yatasa'aloon"};
+    public int hifzPos() { return p.getInt("hifzPos", 0); }            // quarters memorized (0..240)
+    public int hifzDaily() { return p.getInt("hifzDaily", 4); }        // quarters per day (4 = half para)
+    public int quranToday(String d) { return day(d).optInt("quran", 0); }
+    /** tick (+1) or untick (-1) one quarter today */
+    public void hifzStep(int delta) {
+        String d = today(); JSONObject o = day(d);
+        int today = o.optInt("quran", 0);
+        if (delta < 0 && today <= 0) return;
+        int pos = Math.max(0, Math.min(240, hifzPos() + delta));
+        if (pos == hifzPos()) return;
+        put(o, "quran", Math.max(0, today + delta)); save(d, o);
+        p.edit().putInt("hifzPos", pos).apply();
+    }
+    public void setHifzStartPara(int para) { p.edit().putInt("hifzPos", Math.max(0, Math.min(29, para - 1)) * 8).apply(); }
+    public float quranPct(String d) { return Math.min(1f, quranToday(d) / (float) Math.max(1, hifzDaily())); }
+    public boolean quranDone(String d) { return quranToday(d) >= hifzDaily() || hifzPos() >= 240; }
+
     // ---------------- scores ----------------
     public float waterPct(String d) { return Math.min(1f, water(d) / (float) waterGoal()); }
-    public float taskPct(String d) { int n = tasks().size(); if (n == 0) return 1f; float s = 0; for (JSONObject t : tasks()) s += Math.min(1f, taskVal(d, t.optString("id")) / (float) Math.max(1, t.optInt("target", 1))); return s / n; }
+    public float taskPct(String d) { int n = tasks().size() + 1; float s = quranPct(d); for (JSONObject t : tasks()) s += Math.min(1f, taskVal(d, t.optString("id")) / (float) Math.max(1, t.optInt("target", 1))); return s / n; }
     public float zikrPct(String d) { int n = zikrs().size(); if (n == 0) return 1f; float s = 0; for (JSONObject z : zikrs()) s += Math.min(1f, zikrCount(d, z.optString("id")) / (float) Math.max(1, z.optInt("target", 33))); return s / n; }
     public int score(String d) { return Math.round((waterPct(d) + taskPct(d) + zikrPct(d)) / 3f * 100); }
     public int streak() {

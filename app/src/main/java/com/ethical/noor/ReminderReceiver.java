@@ -63,6 +63,7 @@ public class ReminderReceiver extends BroadcastReceiver {
     static List<String> pending(Data d, String day) {
         List<String> out = new ArrayList<>();
         if (d.water(day) < d.waterGoal()) out.add("water (" + Data.fmt(d.waterGoal() - d.water(day)) + " ml left)");
+        if (!d.quranDone(day)) out.add("Quran hifz (" + (d.hifzDaily() - d.quranToday(day)) + " quarter" + (d.hifzDaily() - d.quranToday(day) > 1 ? "s" : "") + " left)");
         for (JSONObject t : d.tasks()) if (!d.taskDone(day, t)) out.add(t.optString("name").toLowerCase());
         int z = d.zikrs().size() - d.zikrsDone(day);
         if (z > 0) out.add(z + " tasbeeh");

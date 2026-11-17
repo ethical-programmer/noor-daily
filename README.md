@@ -3,19 +3,22 @@
 Healthy, focused and connected to your deen, every day. Everything stays on your phone.
 
 **Health**
-- Water goal from your age, height, weight, sex and activity (+ BMI)
+- Water goal from your age, height (ft/in), weight, sex and activity (+ BMI)
 - One quiet reminder at a time (no ringtone), with an "I drank" button right in the notification
 - Hour-by-hour and 7-day charts
 
-**Daily tasks**
-- Walk, stretching, stairs, eye rest, deep breathing, sunlight, reading, no junk food, phone away before sleep
-- Add your own tasks, tick or count them
+**Daily tasks** (one tap = done)
+- Walk 30 min, stretching, stairs, eye rest, deep breathing, sunlight, no junk food, phone away before sleep
+
+**Quran hifz**
+- Daily portion (¼, ½ or 1 para), tick each quarter as you memorize
+- Current para with its name, 30-para progress grid, finish date estimate, 7-day chart
 - Warnings at 8:00 PM and 10:30 PM about anything left
 - Daily report at 11:59 PM, 7-day score chart, streaks and 14-day history
 
 **Tasbeeh**
 - SubhanAllah, Alhamdulillah, Allahu Akbar, Astaghfirullah, La ilaha illallah, Durood Shareef
-- Big tap counter with vibration, daily targets, add your own
+- Big tap counter with vibration and daily targets (Durood Shareef 30)
 
 **Focus**
 - 15/25/45/60 minute focus sessions with a break reminder
