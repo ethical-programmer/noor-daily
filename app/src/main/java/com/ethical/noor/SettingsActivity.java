@@ -86,7 +86,7 @@ public class SettingsActivity extends Activity {
             String[] items = new String[30]; for (int i = 0; i < 30; i++) items[i] = "Para " + (i + 1) + "  ·  " + Data.PARA[i];
             new AlertDialog.Builder(this, THEME).setTitle("Where are you starting?").setItems(items, (x, i) -> {
                 new AlertDialog.Builder(this, THEME).setTitle("Start from Para " + (i + 1) + "?").setMessage("Paras before it will be marked as memorized.")
-                        .setPositiveButton("Yes", (a, b2) -> { d.setHifzStartPara(i + 1); recreate(); }).setNegativeButton("Cancel", false).show();
+                        .setPositiveButton("Yes", (a, b2) -> { d.setHifzStartPara(i + 1); recreate(); }).setNegativeButton("Cancel", null).show();
             }).show();
         });
         qu.addView(sp, Ui.top(this, 12));
@@ -113,7 +113,7 @@ public class SettingsActivity extends Activity {
         se.addView(pinBtn, Ui.top(this, 12));
         if (d.hasPin()) {
             TextView rm = Ui.button(this, "Remove PIN", false); rm.setTextColor(Ui.RED);
-            rm.setOnClickListener(v -> new AlertDialog.Builder(this, THEME).setTitle("Remove PIN?").setPositiveButton("Remove", (x, y) -> { d.clearPin(); recreate(); }).setNegativeButton("Cancel", false).show());
+            rm.setOnClickListener(v -> new AlertDialog.Builder(this, THEME).setTitle("Remove PIN?").setPositiveButton("Remove", (x, y) -> { d.clearPin(); recreate(); }).setNegativeButton("Cancel", null).show());
             se.addView(rm, Ui.top(this, 8));
         }
         se.addView(sw("Block screenshots & hide in recent apps", "secure", true));
@@ -232,6 +232,6 @@ public class SettingsActivity extends Activity {
             if (!p1.equals(p2)) { Toast.makeText(this, "PINs don't match", Toast.LENGTH_LONG).show(); return; }
             d.setPin(p1); App.unlocked = true;
             Toast.makeText(this, "PIN set", Toast.LENGTH_SHORT).show(); recreate();
-        }).setNegativeButton("Cancel", false).show();
+        }).setNegativeButton("Cancel", null).show();
     }
 }
